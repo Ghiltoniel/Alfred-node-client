@@ -1,5 +1,5 @@
 {
-  "name": "scapegoat",
+  "name": "alfred-node-client",
   "version": "0.1.0",
   "description": "A small library providing utility methods to escape and unescape HTML entities",
   "main": "index.js",
@@ -21,12 +21,17 @@
       "type": "MIT",
       "url": "https://github.com/brentertz/scapegoat/blob/master/LICENSE-MIT"
     }
-  ],  
+  ],
   "bugs": {
     "url": "https://github.com/brentertz/scapegoat/issues"
   },
   "devDependencies": {
     "mocha": "~1.16.2",
     "chai": "~1.8.1"
-  }
+  },
+  "homepage": "https://github.com/brentertz/scapegoat",
+  "directories": {
+    "test": "test"
+  },
+  "license": "ISC"
 }
