@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A small library providing utility methods to escape and unescape HTML entities",
   "main": "index.js",
+  "files": ["ws-client.js"],
   "scripts": {
     "test": "make test"
   },
