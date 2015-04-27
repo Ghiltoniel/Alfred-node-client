@@ -1,4 +1,4 @@
-var wsClient = require('./wsClient');
+var wsClient = require('./ws-client');
 
 AlfredClient = function (name, host, port, login, password, onConnect, onDisconnect) {
     
