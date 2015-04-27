@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "ws": "latest"
-  }
+  },
   "devDependencies": {
     "mocha": "~1.16.2",
     "chai": "~1.8.1"
