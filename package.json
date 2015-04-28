@@ -27,7 +27,9 @@
     "url": "https://github.com/brentertz/scapegoat/issues"
   },
   "dependencies": {
-    "ws": "latest"
+    "ws": "latest",
+    "promise": "latest",
+    "http": "latest"
   },
   "devDependencies": {
     "mocha": "~1.16.2",
