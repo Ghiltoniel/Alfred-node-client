@@ -58,7 +58,6 @@ WsClient = function (name, host, port, login, password, onConnect, onDisconnect)
     
     
     function listener(data) {
-        console.log("Received data from websocket: ", data);
         // If an object exists with callback_id in our callbacks object, resolve it
         for (var i = 0; i < Service.callbacks.length; i++) {
             Service.callbacks[i](data);
