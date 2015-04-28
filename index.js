@@ -13,6 +13,44 @@ var AlfredClient = function (param) {
     var onConnect = parameters.onConnect;
     var onDisconnect = parameters.onDisconnect;
     
+    var postJson = function(path, param, callback){
+        var paramString = JSON.stringify(param);
+        var headers = {
+          'Content-Type': 'application/json',
+          'Content-Length': paramString.length
+        };
+        
+        var options = {
+          host: host,
+          port: 80,
+          path: path,
+          method: 'POST',
+          headers: headers
+        };
+        
+		var req = http.request(options, function(res) {
+          res.setEncoding('utf-8');
+        
+          var responseString = '';
+        
+          res.on('data', function(data) {
+            responseString += data;
+          });
+        
+          res.on('end', function() {
+            var resultObject = JSON.parse(responseString);
+            callback(resultObject);
+          });
+        });
+        
+        req.on('error', function(e) {
+          callback(e);
+        });
+        
+        req.write(paramString);
+        req.end();
+    }
+    
     var websocket = new WsClient(
         name, 
 	    host, 
@@ -52,7 +90,9 @@ var AlfredClient = function (param) {
     };
     
     websocket.subscribe(function (data) {
-        //trigger('test', data.Arguments);
+        if(data.Event){
+            trigger(data.Event, data.Arguments);
+        }
     });
     
     Service.Lights = {
@@ -75,6 +115,20 @@ var AlfredClient = function (param) {
         
         getAll: function () {
             websocket.send("Device_BroadcastLights");
+            
+            var promise = new Promise(function (resolve, reject) {
+              var callback = function(data){
+                if (data != null
+                    && data.Arguments != null
+                    && typeof(data.Arguments.lights) != 'undefined') {
+                    var lights = JSON.parse(data.Arguments.lights);
+                    websocket.unsubscribe(callback);
+                    resolve(lights);
+                }
+              };
+              
+              websocket.subscribe(callback);
+            });
         },
         
         allumeTout: function () {
@@ -117,6 +171,22 @@ var AlfredClient = function (param) {
     Service.Sensors = {
         getAll: function () {
             websocket.send("Sensor_BroadcastSensors");
+            
+            var promise = new Promise(function (resolve, reject) {
+              var callback = function(data){
+                if(typeof(data.Arguments.sensors) != 'undefined') {
+                    var sensors = JSON.parse(data.Arguments.sensors).filter(function(s){
+                        return !isNaN(parseFloat(s.Value))
+                            && parseFloat(s.Value) != 0
+                            && !s.IsActuator;
+                    }); 
+                    websocket.unsubscribe(callback);
+                    resolve(sensors);
+                }
+              };
+              
+              websocket.subscribe(callback);
+            });
         },
         
         getHistory: function (id) {
@@ -162,42 +232,7 @@ var AlfredClient = function (param) {
         },
     
         save: function(scenario, callback){
-            var scenarioString = JSON.stringify(scenario);
-            
-            var headers = {
-              'Content-Type': 'application/json',
-              'Content-Length': scenarioString.length
-            };
-            
-            var options = {
-              host: host,
-              port: 80,
-              path: '/scenario/save',
-              method: 'POST',
-              headers: headers
-            };
-            
-    		var req = http.request(options, function(res) {
-              res.setEncoding('utf-8');
-            
-              var responseString = '';
-            
-              res.on('data', function(data) {
-                responseString += data;
-              });
-            
-              res.on('end', function() {
-                var resultObject = JSON.parse(responseString);
-                callback();
-              });
-            });
-            
-            req.on('error', function(e) {
-              callback(e);
-            });
-            
-            req.write(scenarioString);
-            req.end();
+            postJson('/scenario/save', scenario, callback);
         }
     };
     
