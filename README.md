@@ -1,4 +1,4 @@
-Scapegoat
+Alfred Node Client
 =========
 
 A minimal client library to connect and interact with alfred servers.
