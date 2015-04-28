@@ -1,6 +1,17 @@
 var wsClient = require('./ws-client');
+var Promise = require('promise');
+var http = require('http');
 
-AlfredClient = function (name, host, port, login, password, onConnect, onDisconnect) {
+var AlfredClient = function (param) {
+    
+    var parameters = param || {};
+    var name = parameters.name || 'Alfred-node-client';
+    var host = parameters.host || 'localhost';
+    var port = parameters.port || 13100;
+    var login = parameters.login || 'login';
+    var password = parameters.password || 'password';
+    var onConnect = parameters.onConnect;
+    var onDisconnect = parameters.onDisconnect;
     
     var websocket = new WsClient(
         name, 
@@ -32,8 +43,10 @@ AlfredClient = function (name, host, port, login, password, onConnect, onDisconn
     
     var trigger = function (name, args) {
         for (var name in events) {
-            var handler = events[name];
-            handler.call(null, args);
+            for (var j in events[name]) {
+                var handler = events[name][j];
+                handler.call(null, args);
+            }
         }
         return this;
     };
@@ -111,6 +124,129 @@ AlfredClient = function (name, host, port, login, password, onConnect, onDisconn
                 'id': id
             });
         }
+    };
+    
+    Service.Chat = {
+        send: function (text) {
+            websocket.send("Chat_Send", {
+                'text': text
+            });
+        }
+    };
+    
+    Service.Scenario = {
+        run: function(name){
+            websocket.send("Scenario_LaunchScenario", {
+                'mode': name
+            });
+        },
+    
+        getAll: function(){
+            websocket.send("Scenario_BroadcastScenarios");
+            
+            var promise = new Promise(function (resolve, reject) {
+              var callback = function(data){
+                if (data != null
+                  && data.Arguments != null
+                  && typeof(data.Arguments.scenarios) != 'undefined') {
+                  var scenarios = JSON.parse(data.Arguments.scenarios);
+                  websocket.unsubscribe(callback);
+                  resolve(scenarios);
+                }
+              };
+              
+              websocket.subscribe(callback);
+            });
+        },
+    
+        save: function(scenario, callback){
+            var scenarioString = JSON.stringify(scenario);
+            
+            var headers = {
+              'Content-Type': 'application/json',
+              'Content-Length': scenarioString.length
+            };
+            
+            var options = {
+              host: host,
+              port: 80,
+              path: '/scenario/save',
+              method: 'POST',
+              headers: headers
+            };
+            
+    		var req = http.request(options, function(res) {
+              res.setEncoding('utf-8');
+            
+              var responseString = '';
+            
+              res.on('data', function(data) {
+                responseString += data;
+              });
+            
+              res.on('end', function() {
+                var resultObject = JSON.parse(responseString);
+                callback();
+              });
+            });
+            
+            req.on('error', function(e) {
+              callback(e);
+            });
+            
+            req.write(scenarioString);
+            req.end();
+        }
+    };
+    
+    Service.Player = {
+        register: function (name) {
+            websocket.send("Player_Register", {
+                'name': name
+            });
+        },
+        
+        unregister: function (name) {
+            websocket.send("Player_Unregister");
+        },
+        
+        sendReadyToPlaySignal : function () {
+            websocket.send("Player_ReadyToPlay");
+        },
+    
+        sendPlayPauseSignal : function () {
+            websocket.send("MediaManager_PlayPause");
+        },
+    
+        sendNextSongSignal : function () {
+            websocket.send("MediaManager_Next");
+        },
+        
+        sendPreviousSongSignal : function () {
+            websocket.send("MediaManager_Previous");
+        },
+    
+        sendUpdateStatusSignal : function (status, duration, position, volume) {
+            var args = {};
+    
+            if (status != '')
+                args.status = status;
+    
+            if (!isNaN(duration))
+                args.length = ('' + duration).replace('.', ',');
+    
+            if (!isNaN(position))
+                args.position = ('' + position).replace('.', ',');
+    
+            if (!isNaN(volume))
+                args.volume = ('' + volume).replace('.', ',');
+    
+            websocket.send("MediaManager_UpdateStatus", args);
+        }
+    };
+    
+    Service.ping = function(){
+        websocket.sendRaw('ping');
     };
     
     return Service;

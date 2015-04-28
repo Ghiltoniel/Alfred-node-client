@@ -65,6 +65,10 @@ WsClient = function (name, host, port, login, password, onConnect, onDisconnect)
         }
     }
     
+    Service.sendRaw = function(text){
+        ws.send(text);
+    };
+    
     Service.send = function (baseCommand, args) {
         if (args == null)
             args = {};
@@ -82,6 +86,14 @@ WsClient = function (name, host, port, login, password, onConnect, onDisconnect)
     
     Service.subscribe = function (callback) {
         Service.callbacks.push(callback);
+    }
+    
+    
+    Service.unsubscribe = function (callback) {
+        var index = Service.callbacks.indexOf(callback);
+        if (index > -1) {
+            Service.callbacks.splice(index, 1);
+        }
     }
 
     return Service;
