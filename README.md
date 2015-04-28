@@ -1,26 +1,44 @@
 Scapegoat
 =========
 
-A minimal node module providing utility methods to `escape` and `unescape` HTML entities
+A minimal client library to connect and interact with alfred servers.
 
 ## Installation
 
 ```shell
-  npm install scapegoat --save
+  npm install alfred-node-client --save
 ```
 
 ## Usage
 
 ```js
-  var scapegoat = require('scapegoat')
-      escape = scapegoat.escape,
-      unescape = scapegoat.unescape;
+  var alfred = require('alfred-node-client');
 
-  var html = '<h1>Hello World</h1>',
-      escaped = escape(html),
-      unescaped = unescape(escaped);
+  var AlfredClient = require('alfred-node-client');
 
-  console.log('html', html, 'escaped', escaped, 'unescaped', unescaped);
+  var client = new AlfredClient(
+      {
+        name: 'test_node',  // Your client's name (optional)
+  	    host: 'localhost',  // Your server's host
+  	    port: 13100,  // Your server's port
+  	    login: 'login',  // Your server's username
+  	    password: 'password', // Your server's password
+  	    onConnect: function () {
+              console.log('loginned !');
+              client.Lights.getAll().then(function(lights){
+                  console.log(lights);
+              }, function(error){
+                  console.log(error);
+              });
+          },
+  	    onDisconnect: function () {
+              console.log('disconnected !');
+          }
+      });
+  
+  client.subscribe(function (data) {
+      console.log(data);
+  });
 ```
 
 ## Tests

@@ -1,7 +1,7 @@
 {
   "name": "alfred-node-client",
   "version": "0.1.0",
-  "description": "A small library providing utility methods to escape and unescape HTML entities",
+  "description": "A small client library for alfred servers",
   "main": "index.js",
   "files": ["ws-client.js"],
   "scripts": {
@@ -9,22 +9,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/brentertz/scapegoat.git"
+    "url": "git://github.com/Ghiltoniel/Alfred-node-client.git"
   },
   "keywords": [
     "escape",
     "unescape",
     "html"
   ],
-  "author": "Brent Ertz <brent.ertz@gmail.com> (http://brentertz.com/)",
+  "author": "Guillaume Jacquart <guillaume.jacquart@live.fr>",
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/brentertz/scapegoat/blob/master/LICENSE-MIT"
+      "url": "https://github.com/Ghiltoniel/Alfred-node-client/blob/master/LICENSE-MIT"
     }
   ],
   "bugs": {
-    "url": "https://github.com/brentertz/scapegoat/issues"
+    "url": "https://github.com/Ghiltoniel/Alfred-node-client/issues"
   },
   "dependencies": {
     "ws": "latest",
@@ -35,7 +35,7 @@
     "mocha": "~1.16.2",
     "chai": "~1.8.1"
   },
-  "homepage": "https://github.com/brentertz/scapegoat",
+  "homepage": "https://github.com/Ghiltoniel/Alfred-node-client",
   "directories": {
     "test": "test"
   },
