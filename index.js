@@ -129,6 +129,8 @@ var AlfredClient = function (param) {
               
               websocket.subscribe(callback);
             });
+            
+            return promise;
         },
         
         allumeTout: function () {
@@ -187,12 +189,26 @@ var AlfredClient = function (param) {
               
               websocket.subscribe(callback);
             });
+            
+            return promise;
         },
         
         getHistory: function (id) {
             websocket.send("Sensor_BroadcastSensorHistory", {
                 'id': id
             });
+            
+            var promise = new Promise(function (resolve, reject) {
+              var callback = function(data){
+                if(typeof(data.Arguments.history) != 'undefined') {
+                    websocket.unsubscribe(callback);
+                    resolve(data.Arguments.history);
+                }
+              };
+              websocket.subscribe(callback);
+            });
+            
+            return promise;
         }
     };
     
