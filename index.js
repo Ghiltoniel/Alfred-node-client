@@ -157,6 +157,8 @@ var AlfredClient = function (param) {
               
               websocket.subscribe(callback);
             });
+            
+            return promise;
         },
     
         save: function(scenario, callback){
