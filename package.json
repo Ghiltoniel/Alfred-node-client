@@ -1,6 +1,6 @@
 {
   "name": "alfred-node-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A small client library for alfred servers",
   "main": "index.js",
   "files": ["ws-client.js"],
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Ghiltoniel/Alfred-node-client.git"
+    "url": "https://github.com/Ghiltoniel/Alfred-node-client.git"
   },
   "keywords": [
     "escape",

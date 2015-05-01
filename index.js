@@ -212,6 +212,14 @@ var AlfredClient = function (param) {
         }
     };
     
+    Service.TextToSpeech = {
+        speak: function (text) {
+            websocket.send("Alfred_PlayTempString", {
+                'sentence': text
+            });
+        }
+    };
+    
     Service.Chat = {
         send: function (text) {
             websocket.send("Chat_Send", {
@@ -249,6 +257,41 @@ var AlfredClient = function (param) {
     
         save: function(scenario, callback){
             postJson('/scenario/save', scenario, callback);
+        }
+    };
+    
+    Service.Torrent = {
+        search: function(term, callback){
+            http.get('https://yts.to/api/v2/list_movies.json?query_term=' + term, callback);
+        },
+    
+        download: function(torrentHash, torrentName, callback){
+            var tracker = 'udp://open.demonii.com:1337';
+            var magnet = 'magnet:?xt=urn:btih:' + torrentHash + '&dn=' + encodeURI(torrentName) + '&tr=' + tracker;
+            http.get("http://"+host+"/torrent/download?magnet=" + magnet, callback);
+        }
+    };
+    
+    Service.People = {
+        getAll: function(){
+            websocket.send("People_Broadcast");
+            
+            var promise = new Promise(function (resolve, reject) {
+              var callback = function(data){
+                if (data != null
+                  && data.Arguments != null
+                  && data.Command == 'People_List'
+                  && typeof(data.Arguments.people) != 'undefined') {
+                  var people = JSON.parse(data.Arguments.people);
+                  websocket.unsubscribe(callback);
+                  resolve(people);
+                }
+              };
+              
+              websocket.subscribe(callback);
+            });
+            
+            return promise;
         }
     };
     
