@@ -320,7 +320,14 @@ var AlfredClient = function (param) {
         
         sendPreviousSongSignal : function () {
             websocket.send("MediaManager_Previous");
-        },
+        },		
+		
+		volume: function(volume, channel) {
+			websocket.send("Common_Volume", {
+				volume: volume,
+				channel: channel || 0
+			});
+		},
     
         sendUpdateStatusSignal : function (status, duration, position, volume) {
             var args = {};
@@ -338,7 +345,7 @@ var AlfredClient = function (param) {
                 args.volume = ('' + volume).replace('.', ',');
     
             websocket.send("MediaManager_UpdateStatus", args);
-        }
+        },
     };
     
     Service.ping = function(){
